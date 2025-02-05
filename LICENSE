@@ -1,19 +1,33 @@
-zlib License
+DamonXue Exclusive License
 
-(C) 2025 DamonXue2
+Copyright (C) 2025 DamonXue
+All rights reserved.
 
-This software is provided 'as-is', without any express or implied
-warranty.  In no event will the authors be held liable for any damages
-arising from the use of this software.
+The intellectual property contained in this software is exclusively owned 
+by DamonXue (hereinafter referred to as "the Author"). 
 
-Permission is granted to anyone to use this software for any purpose,
-including commercial applications, and to alter it and redistribute it
-freely, subject to the following restrictions:
+1. Exclusive Rights Reservation
+   a) All rights are exclusively reserved by the Author
+   b) No person/entity except the Author is granted any license/right to:
+      - Use (including testing, deployment, integration)
+      - Copy (except for archival purposes without activation)
+      - Modify (including translation, adaptation, derivation)
+      - Distribute (including sublicensing, resale, mirroring)
+      - Reverse engineer
+      - Exploit commercially or non-commercially
 
-1. The origin of this software must not be misrepresented; you must not
-   claim that you wrote the original software. If you use this software
-   in a product, an acknowledgment in the product documentation would be
-   appreciated but is not required.
-2. Altered source versions must be plainly marked as such, and must not be
-   misrepresented as being the original software.
-3. This notice may not be removed or altered from any source distribution.
+2. Code Visibility
+   a) Source code is published for transparency review ONLY
+   b) Code viewing does not constitute license grant
+
+3. Violation Penalties
+   a) Unauthorized use constitutes copyright infringement
+   b) Violators will face legal action under applicable laws
+
+4. Termination
+   Any breach of this license automatically voids all permissions
+
+5. Jurisdiction
+   This license shall be governed by the laws of [Your Jurisdiction]
+
+This notice must accompany all partial or complete copies of the work.

@@ -5,7 +5,7 @@ import base64
 
 class Config:
     # Discord配置
-    DISCORD_TOKEN = 'MTMzMTU1NTA4OTA0Mjg5ODk1NQ.G4g9m8.BCdd0yuh0VEVQW6GyOFCOsscUwQoU9x-nBdbxM'
+    DISCORD_TOKEN = 'your-discord-token'
     
     # 数据库配置
     DB_HOST = 'localhost'
@@ -15,8 +15,8 @@ class Config:
     DB_NAME = 'discord'
     
     # Nostr配置
-    NOSTR_RELAY_URLS = ['ws://144.126.138.135:10548']
-    NOSTR_PRIVATE_KEY = os.getenv('NOSTR_PRIVATE_KEY', 'nsec1ufnus6pju578ste3v90xd5m2decpuzpql2295m3sknqcjzyys9ls0qlc85')
+    NOSTR_RELAY_URLS = ['ws://your-relay-url']
+    NOSTR_PRIVATE_KEY = os.getenv('NOSTR_PRIVATE_KEY', 'your-private-key')
 
     # API配置
     API_PORT = int(os.getenv('API_PORT', 8888))

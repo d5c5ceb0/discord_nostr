@@ -83,23 +83,24 @@ class DiscordCollector(discord.Client):
                         'channel_id': message.reference.channel_id
                     }
                     interaction_data['note'] = str(info)
-                    interaction_data['type'] = InteractionType.REPLY.value if message.reference.channel_id == message.channel.id else InteractionType.RETWEET.value
+                    interaction_data[
+                        'type'] = InteractionType.REPLY.value if message.reference.channel_id == message.channel.id else InteractionType.RETWEET.value
 
-                # 判断消息是否存在过表情互动
-                if message.reactions:
-                    for reaction in message.reactions:
-                        for user in await reaction.users().flatten():
-                            info = {
-                                'emoji': reaction.emoji,
-                                'user': user.name,
-                                'message_id': message.id,
-                                'channel_id': message.channel.id
-                            }
-                            interactions_data.append({
-                                **interaction_data,
-                                'note': str(info),
-                                'type': InteractionType.LIKE.value
-                            })
+                # # 判断消息是否存在过表情互动
+                # if message.reactions:
+                #     for reaction in message.reactions:
+                #         for user in await reaction.users().flatten():
+                #             info = {
+                #                 'emoji': reaction.emoji,
+                #                 'user': user.name,
+                #                 'message_id': message.id,
+                #                 'channel_id': message.channel.id
+                #             }
+                #             interactions_data.append({
+                #                 **interaction_data,
+                #                 'note': str(info),
+                #                 'type': InteractionType.LIKE.value
+                #             })
 
             # 批量保存到数据库
             if interactions_data:
@@ -128,6 +129,7 @@ class DiscordCollector(discord.Client):
                     if self.check_channel_collect_time(channel_id, frequency):
                         collect_start_time = channel.collect_start_time
                         collect_end_time = channel.collect_end_time
+                        last_message_post_time = None
 
                         # 确保时间有正确的时区信息
                         if collect_start_time:
@@ -137,18 +139,26 @@ class DiscordCollector(discord.Client):
                             collect_end_time = collect_end_time if collect_end_time.tzinfo else collect_end_time.replace(
                                 tzinfo=timezone.utc)
 
-                        # 如果没有指定时间范围，使用上次记录的最后消息时间
-                        if not collect_start_time and not collect_end_time:
-                            last_message_id = self.db_service.select_max_interaction_id(db, channel_id)
-                            if last_message_id:
-                                # 获取这条消息的实际时间并加1毫秒
-                                collect_start_time = await self.get_message_created_time(
-                                    discord_channel,
-                                    last_message_id
-                                )
-                            if collect_start_time:
-                                collect_start_time = collect_start_time if collect_start_time.tzinfo else collect_start_time.replace(
-                                    tzinfo=timezone.utc)
+                        # 使用上次记录的最后消息时间
+                        last_message_id = self.db_service.select_max_interaction_id(db, channel_id)
+                        if last_message_id:
+                            # 获取这条消息的实际时间并加1毫秒
+                            last_message_post_time = await self.get_message_created_time(
+                                discord_channel,
+                                last_message_id
+                            )
+                        if last_message_post_time:
+                            last_message_post_time = last_message_post_time if last_message_post_time.tzinfo else last_message_post_time.replace(
+                                tzinfo=timezone.utc)
+
+                        if collect_start_time and last_message_post_time:
+                            collect_start_time = max(collect_start_time, last_message_post_time)
+                        elif last_message_post_time:
+                            collect_start_time = last_message_post_time
+                        elif collect_start_time:
+                            collect_start_time = collect_start_time
+                        else:
+                            collect_start_time = None
 
                         # 保存采集日志
                         self.db_service.save_channel_collect_log(db, channel_id, collect_start_time, collect_end_time)
@@ -262,6 +272,13 @@ class DiscordCollector(discord.Client):
                     message = await channel.fetch_message(payload.message_id)
                     user = await self.fetch_user(payload.user_id)
 
+                    info = {
+                        'emoji': payload.emoji,
+                        'user': user.name,
+                        'message_id': message.id,
+                        'channel_id': message.channel.id
+                    }
+
                     # 创建交互记录
                     interaction = Interaction(
                         message_id=message.id,
@@ -272,7 +289,7 @@ class DiscordCollector(discord.Client):
                         interaction_time=message.created_at,
                         post_time=message.created_at,
                         type=InteractionType.LIKE.value,
-                        note=str(payload.emoji)
+                        note=str(info)
                     )
 
                     self.db_service.save_channel_interaction(db, interaction)

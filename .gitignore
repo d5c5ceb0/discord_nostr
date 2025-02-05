@@ -1,0 +1,8 @@
+/logs/
+/logs/*
+.idea/*
+*.iml
+*.log
+sqldialects.xml
+vcs.xml
+.venv/

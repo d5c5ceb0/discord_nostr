@@ -1,0 +1,21 @@
+discord==2.1.0
+Flask==2.0.1
+SQLAlchemy==1.4.23
+PyMySQL==1.0.2  # 替换 mysqlclient
+cryptography==41.0.0  # 用于 PyMySQL
+git+https://github.com/holgern/pynostr.git@v0.6.2#egg=pynostr
+# 以下nostr库暂时无法正常使用坑较多
+# nostr==0.0.2
+# git+https://github.com/monty888/monstr.git@v0.1.9#egg=monstr
+# nostr_sdk==0.38.0
+python-dotenv==0.19.0
+flask-swagger-ui==4.11.1
+apispec==6.3.0
+marshmallow==3.19.0
+flask_limiter==1.4
+flask_cors==3.0.10
+Werkzeug==2.0.3
+cryptography==41.0.0
+pytest~=8.3.4
+websocket-client==1.8.0
+pytz==2023.4

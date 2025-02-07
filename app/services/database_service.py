@@ -87,7 +87,7 @@ class DatabaseService:
             .count()
 
     @staticmethod
-    def get_user_interaction_stats(db: Session, user_id: str) -> Tuple[int, List[Dict]]:
+    def get_user_interaction_stats(db: Session, user_id: str, start_time: int, end_time: int) -> Tuple[int, List[Dict]]:
         # 获取所有有效频道
         channels = db.query(Channel).all()
 
@@ -98,18 +98,21 @@ class DatabaseService:
         result = []
 
         for channel in channels:
-            cutoff_time = DatabaseService.parse_expiration_time(channel.expiration_time)
-
-            count = db.query(func.count(Interaction.interaction_id)) \
+            query = db.query(func.count(Interaction.interaction_id)) \
                 .filter(
                 Interaction.user_id == user_id,
-                Interaction.channel_id == channel.channel_id,
-                Interaction.collect_time > cutoff_time
-            ).scalar()
+                Interaction.channel_id == channel.channel_id
+            )
+            if start_time:
+                query = query.filter(Interaction.collect_time > start_time)
+            if end_time:
+                query = query.filter(Interaction.collect_time < end_time)
+
+            count = query.scalar()
 
             if count > 0:
                 total += count
-                result.append({channel.channel_id: count})
+                result.append({'channel_id': channel.channel_id, 'count': count})
 
         return total, result
 

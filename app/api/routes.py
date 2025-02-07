@@ -73,7 +73,7 @@ def get_channel_interactions(channel_id: int):
 
 @api.route('/users/<user_id>/interactions', methods=['GET'])
 @handle_exceptions
-def get_user_interactions(user_id: str):
+def get_user_interactions(user_id: str, start_time: int = None, end_time: int = None):
     """
     获取用户互动统计
     ---
@@ -83,6 +83,17 @@ def get_user_interactions(user_id: str):
         type: string
         required: true
         description: Discord用户ID
+      - start_time
+        in: query
+        type: long
+        required: false
+        description: 开始时间
+      - end_time
+        in: query
+        type: long
+        required: false
+        description: 结束时间
+
     responses:
       200:
         description: 成功返回用户统计数据
@@ -93,7 +104,7 @@ def get_user_interactions(user_id: str):
     """
     db = next(get_db())
     try:
-        total, per_channel = DatabaseService.get_user_interaction_stats(db, user_id)
+        total, per_channel = DatabaseService.get_user_interaction_stats(db, user_id, start_time, end_time)
 
         if total == 0:
             return jsonify({

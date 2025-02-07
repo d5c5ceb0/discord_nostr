@@ -16,7 +16,7 @@ class SwaggerDocs:
                 "contact": {"email": "your-email@example.com"}
             }
         )
-        
+
         # 注册所有schemas
         self.register_schemas()
         # 注册所有路径
@@ -29,7 +29,7 @@ class SwaggerDocs:
         #         "name": "X-API-Key"
         #     }
         # )
-    
+
     def register_schemas(self):
         # 注册请求/响应模型
         self.spec.components.schema("Channel", schema=BaseChannelSchema)
@@ -84,6 +84,18 @@ class SwaggerDocs:
                             "in": "path",
                             "required": True,
                             "schema": {"type": "string"}
+                        },
+                        {
+                            "name": "start_time",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "long"}
+                        },
+                        {
+                            "name": "end_time",
+                            "in": "query",
+                            "required": False,
+                            "schema": {"type": "long"}
                         }
                     ],
                     "responses": {
@@ -97,8 +109,8 @@ class SwaggerDocs:
                                             "user_id": {"type": "string"},
                                             "total_interactions": {"type": "integer"},
                                             "per_channel": {
-                                                "type": "object",
-                                                "additionalProperties": {"type": "integer"}
+                                                "channel_id": {"type": "string"},
+                                                "count": {"type": "integer"}
                                             }
                                         }
                                     }

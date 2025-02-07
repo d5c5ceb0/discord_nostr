@@ -1,3 +1,4 @@
+import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -104,9 +105,9 @@ class DatabaseService:
                 Interaction.channel_id == channel.channel_id
             )
             if start_time:
-                query = query.filter(Interaction.collect_time > start_time)
+                query = query.filter(Interaction.collect_time > datetime.fromtimestamp(start_time, pytz.UTC))
             if end_time:
-                query = query.filter(Interaction.collect_time < end_time)
+                query = query.filter(Interaction.collect_time < datetime.fromtimestamp(end_time, pytz.UTC))
 
             count = query.scalar()
 

@@ -73,7 +73,7 @@ def get_channel_interactions(channel_id: int):
 
 @api.route('/users/<user_id>/interactions', methods=['GET'])
 @handle_exceptions
-def get_user_interactions(user_id: str, start_time: int = None, end_time: int = None):
+def get_user_interactions(user_id: str):
     """
     获取用户互动统计
     ---
@@ -102,6 +102,8 @@ def get_user_interactions(user_id: str, start_time: int = None, end_time: int = 
       500:
         description: 服务器错误
     """
+    start_time = request.args.get('start_time', default=None, type=int)
+    end_time = request.args.get('end_time', default=None, type=int)
     db = next(get_db())
     try:
         total, per_channel = DatabaseService.get_user_interaction_stats(db, user_id, start_time, end_time)

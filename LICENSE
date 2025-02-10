@@ -1,33 +1,21 @@
-DamonXue Exclusive License
+MIT License
 
-Copyright (C) 2025 DamonXue
-All rights reserved.
+Copyright (c) 2025 DamonXue
 
-The intellectual property contained in this software is exclusively owned 
-by DamonXue (hereinafter referred to as "the Author"). 
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
 
-1. Exclusive Rights Reservation
-   a) All rights are exclusively reserved by the Author
-   b) No person/entity except the Author is granted any license/right to:
-      - Use (including testing, deployment, integration)
-      - Copy (except for archival purposes without activation)
-      - Modify (including translation, adaptation, derivation)
-      - Distribute (including sublicensing, resale, mirroring)
-      - Reverse engineer
-      - Exploit commercially or non-commercially
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
 
-2. Code Visibility
-   a) Source code is published for transparency review ONLY
-   b) Code viewing does not constitute license grant
-
-3. Violation Penalties
-   a) Unauthorized use constitutes copyright infringement
-   b) Violators will face legal action under applicable laws
-
-4. Termination
-   Any breach of this license automatically voids all permissions
-
-5. Jurisdiction
-   This license shall be governed by the laws of [Your Jurisdiction]
-
-This notice must accompany all partial or complete copies of the work.
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.

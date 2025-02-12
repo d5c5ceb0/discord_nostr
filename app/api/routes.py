@@ -83,6 +83,17 @@ def get_user_interactions(user_id: str):
         type: string
         required: true
         description: Discord用户ID
+      - start_time
+        in: query
+        type: long
+        required: false
+        description: 开始时间
+      - end_time
+        in: query
+        type: long
+        required: false
+        description: 结束时间
+
     responses:
       200:
         description: 成功返回用户统计数据
@@ -91,9 +102,11 @@ def get_user_interactions(user_id: str):
       500:
         description: 服务器错误
     """
+    start_time = request.args.get('start_time', default=None, type=int)
+    end_time = request.args.get('end_time', default=None, type=int)
     db = next(get_db())
     try:
-        total, per_channel = DatabaseService.get_user_interaction_stats(db, user_id)
+        total, per_channel = DatabaseService.get_user_interaction_stats(db, user_id, start_time, end_time)
 
         if total == 0:
             return jsonify({
@@ -114,6 +127,79 @@ def get_user_interactions(user_id: str):
         }), 500
     except Exception as e:
         logger.error(f"Unexpected error in get_user_interactions: {str(e)}")
+        return jsonify({
+            'error': 'Internal server error',
+            'message': 'An unexpected error occurred'
+        }), 500
+    finally:
+        db.close()
+
+
+@api.route('/users/<user_id>/interactions_history', methods=['GET'])
+@handle_exceptions
+def get_user_interactions_history(user_id: str):
+    """
+    获取用户互动历史
+    ---
+    parameters:
+      - name: user_id
+        in: path
+        type: string
+        required: true
+        description: Discord用户ID
+      - name: channel_id
+        in: query
+        type: string
+        required: false
+        description: 频道ID (可选)
+      - name: offset
+        in: query
+        type: integer
+        required: false
+        description: 分页偏移量
+      - name: limit
+        in: query
+        type: integer
+        required: false
+        description: 分页大小
+    responses:
+      200:
+        description: 成功返回用户互动历史
+      404:
+        description: 未找到互动记录
+      500:
+        description: 服务器错误
+    """
+    channel_id = request.args.get('channel_id', default=None, type=str)
+    offset = request.args.get('offset', default=0, type=int)
+    limit = request.args.get('limit', default=10, type=int)
+
+    db = next(get_db())
+    try:
+        message_count, messages = DatabaseService.get_user_interaction_history(
+            db, user_id, channel_id, offset, limit
+        )
+
+        if message_count == 0:
+            return jsonify({
+                'error': 'No interactions found',
+                'user_id': user_id
+            }), 404
+
+        return jsonify({
+            'user_id': user_id,
+            'message_count': message_count,
+            'messages': messages
+        })
+
+    except SQLAlchemyError as e:
+        logger.error(f"Database error when getting user interaction history: {str(e)}")
+        return jsonify({
+            'error': 'Database error',
+            'message': 'Error accessing database'
+        }), 500
+    except Exception as e:
+        logger.error(f"Unexpected error in get_user_interactions_history: {str(e)}")
         return jsonify({
             'error': 'Internal server error',
             'message': 'An unexpected error occurred'

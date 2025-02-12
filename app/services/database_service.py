@@ -1,3 +1,4 @@
+import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
 from datetime import datetime, timedelta
@@ -87,7 +88,7 @@ class DatabaseService:
             .count()
 
     @staticmethod
-    def get_user_interaction_stats(db: Session, user_id: str) -> Tuple[int, List[Dict]]:
+    def get_user_interaction_stats(db: Session, user_id: str, start_time: int, end_time: int) -> Tuple[int, List[Dict]]:
         # 获取所有有效频道
         channels = db.query(Channel).all()
 
@@ -98,18 +99,21 @@ class DatabaseService:
         result = []
 
         for channel in channels:
-            cutoff_time = DatabaseService.parse_expiration_time(channel.expiration_time)
-
-            count = db.query(func.count(Interaction.interaction_id)) \
+            query = db.query(func.count(Interaction.interaction_id)) \
                 .filter(
                 Interaction.user_id == user_id,
-                Interaction.channel_id == channel.channel_id,
-                Interaction.collect_time > cutoff_time
-            ).scalar()
+                Interaction.channel_id == channel.channel_id
+            )
+            if start_time:
+                query = query.filter(Interaction.collect_time > datetime.fromtimestamp(start_time, pytz.UTC))
+            if end_time:
+                query = query.filter(Interaction.collect_time < datetime.fromtimestamp(end_time, pytz.UTC))
+
+            count = query.scalar()
 
             if count > 0:
                 total += count
-                result.append({channel.channel_id: count})
+                result.append({'channel_id': channel.channel_id, 'count': count})
 
         return total, result
 
@@ -280,3 +284,44 @@ class DatabaseService:
 
         total_days = number * time_units[unit]
         return datetime.now() - timedelta(days=total_days)
+
+    @staticmethod
+    def get_user_interaction_history(db: Session, 
+                                   user_id: str, 
+                                   channel_id: str = None, 
+                                   offset: int = 0, 
+                                   limit: int = 10) -> Tuple[int, List[Dict[str, Any]]]:
+        """
+        获取用户互动历史
+        
+        Args:
+            db: 数据库会话
+            user_id: 用户ID
+            channel_id: 频道ID (可选)
+            offset: 分页偏移量
+            limit: 分页大小
+            
+        Returns:
+            Tuple[消息数量, 消息列表]
+        """
+        query = db.query(Interaction)\
+            .filter(Interaction.user_id == user_id)\
+            .order_by(Interaction.interaction_time.desc())
+
+        if channel_id:
+            query = query.filter(Interaction.channel_id == channel_id)
+
+        # 获取总数
+        total_count = query.count()
+
+        # 应用分页
+        messages = query.offset(offset).limit(limit).all()
+
+        # 格式化返回数据
+        formatted_messages = [{
+            'channel_id': msg.channel_id,
+            'message': msg.interaction_content,
+            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
+        } for msg in messages]
+
+        return total_count, formatted_messages

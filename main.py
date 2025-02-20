@@ -87,14 +87,14 @@ if __name__ == '__main__':
     try:
         # 启动 Discord 进程
         logger.info("Starting Discord collector process...")
-        # discord_process.start()
+        discord_process.start()
 
         # 启动 Flask 进程
         logger.info("Starting Flask application process...")
         flask_process.start()
 
         # 等待进程结束
-        #discord_process.join()
+        discord_process.join()
         flask_process.join()
     except KeyboardInterrupt:
         logger.info("Shutting down...")

@@ -1,10 +1,47 @@
 import discord
+import requests
+import socket
 from app import create_app
 from config.config import Config
 from utils.logger import Logger
 from app.services.discord_collector import DiscordCollector
 
 logger = Logger('main')
+
+def get_local_ip():
+    """通过创建socket连接获取本机IP"""
+    try:
+        # 创建一个UDP socket连接
+        s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
+        # 连接一个外部地址（不需要真实连接）
+        s.connect(('8.8.8.8', 80))
+        # 获取本地IP
+        ip = s.getsockname()[0]
+        s.close()
+        return ip
+    except Exception as e:
+        logger.error(f"Error getting local IP: {str(e)}")
+        return '127.0.0.1'
+
+
+def register_service(host: str):
+    """注册服务到心跳检测系统"""
+    try:
+        data = {
+            'ip_or_domain': f"http://{host}:{Config.API_PORT}",
+            'service_id': Config.SERVICE_ID
+        }
+        response = requests.post(
+            f"{Config.HEARTBEAT_SERVICE_URL}/register-heartbeat",
+            json=data,
+            timeout=5
+        )
+        if response.status_code == 200:
+            logger.info("Successfully registered service for heartbeat detection")
+        else:
+            logger.error(f"Failed to register service: {response.text}")
+    except Exception as e:
+        logger.error(f"Error registering service: {str(e)}")
 
 
 def run_discord_collector():
@@ -29,7 +66,11 @@ def run_flask_app():
     """运行 Flask 应用"""
     try:
         app = create_app(Config)
-        app.run(host='0.0.0.0', port=Config.API_PORT)
+        host = get_local_ip()  # 获取本机IP
+        # 注册服务时使用实际IP
+        register_service(host)
+        # 启动应用
+        app.run(host='0.0.0.0', port=Config.API_PORT)  # 仍然监听所有接口
     except Exception as e:
         logger.error(f"Failed to start Flask app: {str(e)}")
         raise e
@@ -46,14 +87,14 @@ if __name__ == '__main__':
     try:
         # 启动 Discord 进程
         logger.info("Starting Discord collector process...")
-        discord_process.start()
+        # discord_process.start()
 
         # 启动 Flask 进程
         logger.info("Starting Flask application process...")
         flask_process.start()
 
         # 等待进程结束
-        discord_process.join()
+        #discord_process.join()
         flask_process.join()
     except KeyboardInterrupt:
         logger.info("Shutting down...")

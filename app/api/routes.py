@@ -1,4 +1,4 @@
-from flask import Blueprint, jsonify, request
+from flask import Blueprint, jsonify, request, current_app
 from sqlalchemy.exc import SQLAlchemyError
 from app.models.database import get_db
 from app.services.database_service import DatabaseService
@@ -10,7 +10,6 @@ from app.validators.schemas import (
 )
 from utils.exceptions import ValidationError
 from utils.logger import Logger
-from typing import Dict, Any
 
 api = Blueprint('api', __name__)
 logger = Logger('api')
@@ -401,3 +400,34 @@ def delete_channel():
         }), 500
     finally:
         db.close()
+
+
+@api.route('/ping', methods=['GET'])
+@handle_exceptions
+def ping():
+    """
+    服务健康检查接口
+    ---
+    parameters:
+      - name: service_id
+        in: query
+        type: string
+        required: true
+        description: 服务的唯一标识符
+    responses:
+      200:
+        description: 服务在线
+      404:
+        description: 服务未找到
+    """
+    app = current_app
+    if not app.name:
+        return jsonify({
+            'status': 'error',
+            'message': 'Service not found'
+        })
+
+    return jsonify({
+        'status': 'success',
+        'message': 'service is online'
+    })

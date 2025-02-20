@@ -43,3 +43,6 @@ class Config:
         'messages_per_second': 50,
         'bulk_delete_limit': 100,
     }
+    
+    HEARTBEAT_SERVICE_URL = "http://47.129.153.68:8080"  # Replace with actual heartbeat service URL
+    SERVICE_ID = "discord_nostr_service"  # Replace with your actual service ID

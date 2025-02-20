@@ -19,3 +19,5 @@ cryptography==41.0.0
 pytest~=8.3.4
 websocket-client==1.8.0
 pytz==2023.4
+async_timeout==4.0.0
+requests==2.26.0

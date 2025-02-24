@@ -325,3 +325,51 @@ class DatabaseService:
         } for msg in messages]
 
         return total_count, formatted_messages
+
+    @staticmethod
+    def get_interaction_history(db: Session,
+                                   channel_id: str = None,
+                                   offset: int = 0,
+                                   limit: int = 10,
+                                   start_time: int = None,
+                                   end_time: int = None
+                                ) -> Tuple[int, List[Dict[str, Any]]]:
+        """
+        获取用户互动历史
+
+        Args:
+            db: 数据库会话
+            channel_id: 频道ID (可选)
+            offset: 分页偏移量
+            limit: 分页大小
+
+        Returns:
+            Tuple[消息数量, 消息列表]
+        """
+        query = db.query(Interaction)\
+            .order_by(Interaction.interaction_time.desc())
+
+        if channel_id:
+            query = query.filter(Interaction.channel_id == channel_id)
+
+        if start_time:
+            query = query.filter(Interaction.collect_time > datetime.fromtimestamp(start_time, pytz.UTC))
+        if end_time:
+            query = query.filter(Interaction.collect_time < datetime.fromtimestamp(end_time, pytz.UTC))
+
+
+        # 获取总数
+        total_count = query.count()
+
+        # 应用分页
+        messages = query.offset(offset).limit(limit).all()
+
+        # 格式化返回数据
+        formatted_messages = [{
+            'user_id': msg.user_id,
+            'channel_id': msg.channel_id,
+            'message': msg.interaction_content,
+            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
+        } for msg in messages]
+
+        return total_count, formatted_messages

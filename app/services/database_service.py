@@ -1,7 +1,7 @@
 import pytz
 from sqlalchemy import func
 from sqlalchemy.orm import Session
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from typing import List, Optional, Dict, Any, Tuple
 
 from app.models.models import Channel, Interaction, ChannelCollectLog
@@ -321,7 +321,8 @@ class DatabaseService:
         formatted_messages = [{
             'channel_id': msg.channel_id,
             'message': msg.interaction_content,
-            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
+            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000'),
+            'collect_time': msg.collect_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
         } for msg in messages]
 
         return total_count, formatted_messages
@@ -369,7 +370,9 @@ class DatabaseService:
             'user_id': msg.user_id,
             'channel_id': msg.channel_id,
             'message': msg.interaction_content,
-            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
+            'timestamp': msg.interaction_time.strftime('%a, %d %b %Y %H:%M:%S -0000'),
+            'collect_time': msg.collect_time.strftime('%a, %d %b %Y %H:%M:%S -0000')
+
         } for msg in messages]
 
         return total_count, formatted_messages

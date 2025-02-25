@@ -66,9 +66,9 @@ def run_flask_app():
     """运行 Flask 应用"""
     try:
         app = create_app(Config)
-        host = get_local_ip()  # 获取本机IP
+        #host = get_local_ip()  # 获取本机IP
         # 注册服务时使用实际IP
-        register_service(host)
+        #register_service(host)
         # 启动应用
         app.run(host='0.0.0.0', port=Config.API_PORT)  # 仍然监听所有接口
     except Exception as e:
